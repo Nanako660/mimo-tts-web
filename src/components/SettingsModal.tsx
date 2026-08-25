@@ -118,12 +118,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <span>MiMo API Key</span>
               </label>
               <a
-                href="https://platform.xiaomimimo.com/console/api-keys"
+                href="https://mimo.mi.com/"
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-1 text-[11px] text-orange-600 dark:text-orange-400 hover:underline"
               >
-                <span>获取 API Key</span>
+                <span>前往官网获取 API Key (mimo.mi.com)</span>
                 <ExternalLink className="w-3 h-3" />
               </a>
             </div>

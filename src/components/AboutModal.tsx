@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   X,
   Sparkles,
@@ -14,6 +14,9 @@ import {
   ChevronRight,
   Info,
   FileText,
+  RefreshCw,
+  Globe,
+  Radio,
 } from 'lucide-react';
 import {
   getAppVersion,
@@ -22,7 +25,10 @@ import {
   getCommitUrl,
   getReleaseUrl,
   GITHUB_REPO_URL,
+  MIMO_OFFICIAL_URL,
   RELEASES_HISTORY,
+  VersionRelease,
+  fetchRemoteChangelog,
 } from '../utils/version';
 
 interface AboutModalProps {
@@ -37,14 +43,44 @@ export const AboutModal: React.FC<AboutModalProps> = ({
   defaultTab = 'about',
 }) => {
   const [activeTab, setActiveTab] = useState<'about' | 'changelog'>(defaultTab);
-
-  if (!isOpen) return null;
+  const [releases, setReleases] = useState<VersionRelease[]>(RELEASES_HISTORY);
+  const [loadingChangelog, setLoadingChangelog] = useState<boolean>(false);
+  const [syncStatus, setSyncStatus] = useState<string>('');
 
   const version = getAppVersion();
   const buildTime = getBuildTime();
   const commitHash = getCommitHash();
   const commitUrl = getCommitUrl(commitHash);
   const releaseUrl = getReleaseUrl(version);
+
+  const loadChangelog = async (force: boolean = false) => {
+    setLoadingChangelog(true);
+    try {
+      const result = await fetchRemoteChangelog(force);
+      setReleases(result.releases);
+      if (result.source === 'github_releases') {
+        setSyncStatus('已同步最新 GitHub Releases');
+      } else if (result.source === 'github_raw') {
+        setSyncStatus('已从 GitHub Raw CHANGELOG 同步');
+      } else if (result.source === 'cache') {
+        setSyncStatus(`本地缓存 (${result.lastUpdatedText})`);
+      } else {
+        setSyncStatus('离线内置数据');
+      }
+    } catch {
+      setSyncStatus('同步失败，已展示本地数据');
+    } finally {
+      setLoadingChangelog(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      loadChangelog(false);
+    }
+  }, [isOpen]);
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in">
@@ -79,33 +115,58 @@ export const AboutModal: React.FC<AboutModalProps> = ({
           </button>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="flex px-6 pt-3 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
-          <button
-            onClick={() => setActiveTab('about')}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-all ${
-              activeTab === 'about'
-                ? 'border-orange-500 text-orange-600 dark:text-orange-400'
-                : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
-            }`}
-          >
-            <Info className="w-4 h-4" />
-            <span>关于项目</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('changelog')}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-all ${
-              activeTab === 'changelog'
-                ? 'border-orange-500 text-orange-600 dark:text-orange-400'
-                : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
-            }`}
-          >
-            <FileText className="w-4 h-4" />
-            <span>更新日志</span>
-            <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-              {RELEASES_HISTORY.length}
-            </span>
-          </button>
+        {/* Tab Switcher & Refresh Bar */}
+        <div className="flex items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
+          <div className="flex">
+            <button
+              onClick={() => setActiveTab('about')}
+              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-all ${
+                activeTab === 'about'
+                  ? 'border-orange-500 text-orange-600 dark:text-orange-400'
+                  : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
+              }`}
+            >
+              <Info className="w-4 h-4" />
+              <span>关于项目</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('changelog')}
+              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-all ${
+                activeTab === 'changelog'
+                  ? 'border-orange-500 text-orange-600 dark:text-orange-400'
+                  : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
+              }`}
+            >
+              <FileText className="w-4 h-4" />
+              <span>更新日志</span>
+              <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                {releases.length}
+              </span>
+            </button>
+          </div>
+
+          {activeTab === 'changelog' && (
+            <div className="flex items-center gap-2">
+              {syncStatus && (
+                <span className="text-[11px] text-slate-400 hidden sm:flex items-center gap-1">
+                  <Radio className="w-2.5 h-2.5 text-emerald-500 animate-pulse" />
+                  {syncStatus}
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={() => loadChangelog(true)}
+                disabled={loadingChangelog}
+                className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-orange-600 dark:hover:text-orange-400 bg-slate-100 dark:bg-slate-800 hover:bg-orange-50 dark:hover:bg-orange-950/40 rounded-lg transition-colors disabled:opacity-50"
+                title="强制从 GitHub 检查并拉取最新 Release / CHANGELOG"
+              >
+                <RefreshCw
+                  className={`w-3.5 h-3.5 ${loadingChangelog ? 'animate-spin text-orange-500' : ''}`}
+                />
+                <span className="hidden sm:inline">从 GitHub 刷新</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Content Area */}
@@ -205,7 +266,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({
                         全自动版本与发版体系
                       </h4>
                       <p className="text-slate-500 dark:text-slate-400 mt-0.5">
-                        规范提交、自动 CHANGELOG、GitHub Release CI/CD 构建附件一体化。
+                        规范提交、自动 CHANGELOG、GitHub Release CI/CD 与实时云端同步。
                       </p>
                     </div>
                   </div>
@@ -218,6 +279,21 @@ export const AboutModal: React.FC<AboutModalProps> = ({
                   相关链接
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                  <a
+                    href={MIMO_OFFICIAL_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-orange-300 dark:hover:border-orange-700 bg-slate-50/50 dark:bg-slate-800/30 transition-all hover:shadow-sm group"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Globe className="w-4 h-4 text-orange-500" />
+                      <span className="font-semibold text-slate-800 dark:text-slate-200">
+                        小米 MiMo 官网 (mimo.mi.com)
+                      </span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+                  </a>
+
                   <a
                     href={GITHUB_REPO_URL}
                     target="_blank"
@@ -262,126 +338,118 @@ export const AboutModal: React.FC<AboutModalProps> = ({
                     </div>
                     <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
                   </a>
-
-                  <a
-                    href="https://platform.xiaomi.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-orange-300 dark:hover:border-orange-700 bg-slate-50/50 dark:bg-slate-800/30 transition-all hover:shadow-sm group"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <ExternalLink className="w-4 h-4 text-slate-700 dark:text-slate-300" />
-                      <span className="font-semibold text-slate-800 dark:text-slate-200">
-                        小米开放平台
-                      </span>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
-                  </a>
                 </div>
               </div>
             </div>
           ) : (
             <div className="space-y-6">
-              {RELEASES_HISTORY.map((rel) => (
-                <div
-                  key={rel.version}
-                  className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-5 border border-slate-200/80 dark:border-slate-800 space-y-4"
-                >
-                  {/* Release Title Header */}
-                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/60 dark:border-slate-700/60 pb-3">
-                    <div className="flex items-center gap-2.5">
-                      <span className="font-mono text-base font-bold text-slate-900 dark:text-white">
-                        v{rel.version}
-                      </span>
-                      {rel.isLatest && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900">
-                          最新版本
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5" />
-                        {rel.date}
-                      </span>
-                      <a
-                        href={releaseUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-orange-600 dark:text-orange-400 hover:underline flex items-center gap-0.5 font-medium"
-                      >
-                        GitHub Release <ExternalLink className="w-3 h-3" />
-                      </a>
-                    </div>
-                  </div>
-
-                  {rel.highlights && (
-                    <p className="text-xs font-medium text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800/90 p-3 rounded-lg border border-slate-200/50 dark:border-slate-700/50">
-                      {rel.highlights}
-                    </p>
-                  )}
-
-                  {/* Features */}
-                  {rel.features && rel.features.length > 0 && (
-                    <div className="space-y-1.5">
-                      <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-orange-500 inline-block" />
-                        ✨ 新增功能 (Features)
-                      </h4>
-                      <ul className="space-y-1 pl-4 text-xs text-slate-600 dark:text-slate-300 list-disc marker:text-orange-400">
-                        {rel.features.map((item, idx) => (
-                          <li key={idx}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* Improvements */}
-                  {rel.improvements && rel.improvements.length > 0 && (
-                    <div className="space-y-1.5">
-                      <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />
-                        ⚡️ 性能与优化 (Improvements)
-                      </h4>
-                      <ul className="space-y-1 pl-4 text-xs text-slate-600 dark:text-slate-300 list-disc marker:text-blue-400">
-                        {rel.improvements.map((item, idx) => (
-                          <li key={idx}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* Bug Fixes */}
-                  {rel.fixes && rel.fixes.length > 0 && (
-                    <div className="space-y-1.5">
-                      <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-rose-500 inline-block" />
-                        🐛 缺陷修复 (Bug Fixes)
-                      </h4>
-                      <ul className="space-y-1 pl-4 text-xs text-slate-600 dark:text-slate-300 list-disc marker:text-rose-400">
-                        {rel.fixes.map((item, idx) => (
-                          <li key={idx}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* Docs */}
-                  {rel.docs && rel.docs.length > 0 && (
-                    <div className="space-y-1.5">
-                      <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-slate-400 inline-block" />
-                        📝 文档更新 (Documentation)
-                      </h4>
-                      <ul className="space-y-1 pl-4 text-xs text-slate-600 dark:text-slate-300 list-disc marker:text-slate-400">
-                        {rel.docs.map((item, idx) => (
-                          <li key={idx}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+              {loadingChangelog && releases.length === 0 ? (
+                <div className="flex flex-col items-center justify-center p-12 text-slate-400 space-y-3">
+                  <RefreshCw className="w-8 h-8 animate-spin text-orange-500" />
+                  <span className="text-xs">正在从 GitHub 获取最新更新日志...</span>
                 </div>
-              ))}
+              ) : (
+                releases.map((rel) => (
+                  <div
+                    key={rel.version}
+                    className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-5 border border-slate-200/80 dark:border-slate-800 space-y-4"
+                  >
+                    {/* Release Title Header */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/60 dark:border-slate-700/60 pb-3">
+                      <div className="flex items-center gap-2.5">
+                        <span className="font-mono text-base font-bold text-slate-900 dark:text-white">
+                          v{rel.version}
+                        </span>
+                        {rel.isLatest && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900">
+                            最新版本
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3.5 h-3.5" />
+                          {rel.date}
+                        </span>
+                        <a
+                          href={rel.releaseUrl || releaseUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-orange-600 dark:text-orange-400 hover:underline flex items-center gap-0.5 font-medium"
+                        >
+                          GitHub Release <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
+                    </div>
+
+                    {rel.highlights && (
+                      <p className="text-xs font-medium text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800/90 p-3 rounded-lg border border-slate-200/50 dark:border-slate-700/50">
+                        {rel.highlights}
+                      </p>
+                    )}
+
+                    {/* Features */}
+                    {rel.features && rel.features.length > 0 && (
+                      <div className="space-y-1.5">
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-orange-500 inline-block" />
+                          ✨ 新增功能 (Features)
+                        </h4>
+                        <ul className="space-y-1 pl-4 text-xs text-slate-600 dark:text-slate-300 list-disc marker:text-orange-400">
+                          {rel.features.map((item, idx) => (
+                            <li key={idx}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Improvements */}
+                    {rel.improvements && rel.improvements.length > 0 && (
+                      <div className="space-y-1.5">
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />
+                          ⚡️ 性能与优化 (Improvements)
+                        </h4>
+                        <ul className="space-y-1 pl-4 text-xs text-slate-600 dark:text-slate-300 list-disc marker:text-blue-400">
+                          {rel.improvements.map((item, idx) => (
+                            <li key={idx}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Bug Fixes */}
+                    {rel.fixes && rel.fixes.length > 0 && (
+                      <div className="space-y-1.5">
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-rose-500 inline-block" />
+                          🐛 缺陷修复 (Bug Fixes)
+                        </h4>
+                        <ul className="space-y-1 pl-4 text-xs text-slate-600 dark:text-slate-300 list-disc marker:text-rose-400">
+                          {rel.fixes.map((item, idx) => (
+                            <li key={idx}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Docs */}
+                    {rel.docs && rel.docs.length > 0 && (
+                      <div className="space-y-1.5">
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-slate-400 inline-block" />
+                          📝 文档更新 (Documentation)
+                        </h4>
+                        <ul className="space-y-1 pl-4 text-xs text-slate-600 dark:text-slate-300 list-disc marker:text-slate-400">
+                          {rel.docs.map((item, idx) => (
+                            <li key={idx}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
             </div>
           )}
         </div>
@@ -390,9 +458,14 @@ export const AboutModal: React.FC<AboutModalProps> = ({
         <div className="px-6 py-3.5 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
           <div className="flex items-center gap-1">
             <span>Powered by</span>
-            <span className="font-semibold text-slate-700 dark:text-slate-300">
+            <a
+              href={MIMO_OFFICIAL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-slate-700 dark:text-slate-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
+            >
               Xiaomi MiMo-TTS
-            </span>
+            </a>
           </div>
           <button
             onClick={onClose}

@@ -30,7 +30,7 @@
 ### 2. 🔐 硬件级浏览器本地加密 (Zero Leakage)
 - **Web Crypto API (AES-GCM 256-bit)**：首次打开应用时在用户浏览器本地生成不可导出的非对称/对称私钥并存入本地 IndexedDB，API Key 密文加密后留存。
 - **纯客户端直连**：所有请求直接从用户浏览器端直连小米官方 API 端点（或用户自定义反代端点），不经过任何第三方服务器中转。
-- **自定义 Base URL**：支持配置官方端点 `https://api.xiaomimimo.com/v1` 或自建中转 / Token Plan 代理端点，内置连通性测试与 [API Keys 获取直达](https://platform.xiaomimimo.com/console/api-keys)。
+- **自定义 Base URL**：支持配置官方端点 `https://api.xiaomimimo.com/v1` 或自建中转 / Token Plan 代理端点，内置连通性测试与 [API Keys 官网获取直达 (mimo.mi.com)](https://mimo.mi.com/)。
 
 ### 3. 🎙️ 完整支持全部 MiMo TTS 调用模式
 
