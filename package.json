@@ -8,11 +8,12 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "commit": "cz",
-    "release": "standard-version",
-    "release:patch": "standard-version --release-as patch",
-    "release:minor": "standard-version --release-as minor",
-    "release:major": "standard-version --release-as major",
-    "release:dry": "standard-version --dry-run",
+    "release": "standard-version --release-as patch && git push --follow-tags origin main",
+    "release:patch": "standard-version --release-as patch && git push --follow-tags origin main",
+    "release:minor": "standard-version --release-as minor && git push --follow-tags origin main",
+    "release:major": "standard-version --release-as major && git push --follow-tags origin main",
+    "release:local": "standard-version --release-as patch",
+    "release:dry": "standard-version --release-as patch --dry-run",
     "prepare": "husky"
   },
   "config": {
