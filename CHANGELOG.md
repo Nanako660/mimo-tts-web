@@ -4,6 +4,19 @@
 
 本更新日志遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/) 与 [Semantic Versioning](https://semver.org/lang/zh-CN/) 规范。
 
+## 1.1.0 (2026-08-25)
+
+
+### 📝 文档更新 (Documentation)
+
+* add GitHub Pages live url and update API key acquisition link ([e938b6a](https://github.com/Nanako660/mimo-tts-web/commit/e938b6ab6b575c9ffbb3aab249913baad1cb739d))
+
+
+### ✨ 新增功能 (Features)
+
+* initial commit of Xiaomi MiMo-TTS Studio single-file web application ([1c71796](https://github.com/Nanako660/mimo-tts-web/commit/1c717969b0a08916025c662d3b65ecd460d66d1a))
+* **release:** setup comprehensive version management and in-app changelog UI ([069aa87](https://github.com/Nanako660/mimo-tts-web/commit/069aa8780a90558c25e206125435695cb50c43db))
+
 ## [1.0.0](https://github.com/Nanako660/mimo-tts-web/releases/tag/v1.0.0) (2026-08-26)
 
 ### ✨ 新增功能 (Features)
