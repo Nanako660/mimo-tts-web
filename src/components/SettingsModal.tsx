@@ -10,15 +10,26 @@ import {
   Sliders,
   ExternalLink,
   Lock,
+  Tag,
+  Calendar,
+  GitCommit,
+  Info,
 } from 'lucide-react';
 import { AppSettings } from '../types';
 import { testConnection } from '../services/api';
+import {
+  getAppVersion,
+  getBuildTime,
+  getCommitHash,
+  getCommitUrl,
+} from '../utils/version';
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   settings: AppSettings;
   onSave: (newSettings: AppSettings) => void;
+  onOpenAbout?: () => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -26,6 +37,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
   settings,
   onSave,
+  onOpenAbout,
 }) => {
   if (!isOpen) return null;
 
@@ -209,6 +221,54 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <span className="leading-relaxed">{testResult.message}</span>
             </div>
           )}
+
+          {/* Version & Build Info Card */}
+          <div className="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 text-xs space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-300">
+                <Tag className="w-3.5 h-3.5 text-orange-500" />
+                <span>版本与构建信息</span>
+              </div>
+              {onOpenAbout && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onOpenAbout();
+                  }}
+                  className="text-[11px] text-orange-600 dark:text-orange-400 hover:underline flex items-center gap-1 font-medium"
+                >
+                  <Info className="w-3 h-3" />
+                  <span>查看更新日志</span>
+                </button>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+              <div className="flex items-center gap-1">
+                <span>版本号:</span>
+                <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
+                  v{getAppVersion()}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span>Commit:</span>
+                <a
+                  href={getCommitUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono text-orange-600 dark:text-orange-400 hover:underline flex items-center gap-0.5"
+                >
+                  <GitCommit className="w-2.5 h-2.5" />
+                  {getCommitHash()}
+                </a>
+              </div>
+              <div className="col-span-2 flex items-center gap-1 text-[10px] text-slate-400">
+                <Calendar className="w-3 h-3" />
+                <span>构建时间: {getBuildTime()}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Footer */}

@@ -1,0 +1,20 @@
+module.exports = {
+  header: '# 更新日志 (Changelog)\n\n本项目的所有重要版本演进与修复都将记录在此文件中。\n\n本更新日志遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/) 与 [Semantic Versioning](https://semver.org/lang/zh-CN/) 规范。\n',
+  types: [
+    { type: 'feat', section: '✨ 新增功能 (Features)' },
+    { type: 'fix', section: '🐛 缺陷修复 (Bug Fixes)' },
+    { type: 'perf', section: '⚡️ 性能优化 (Performance Improvements)' },
+    { type: 'refactor', section: '♻️ 代码重构 (Code Refactoring)' },
+    { type: 'docs', section: '📝 文档更新 (Documentation)' },
+    { type: 'style', section: '💄 视觉样式 (Styles & UI)' },
+    { type: 'test', section: '✅ 测试相关 (Tests)' },
+    { type: 'build', section: '📦️ 构建与打包 (Build System)' },
+    { type: 'ci', section: '🎡 持续集成 (CI/CD)' },
+    { type: 'chore', section: '🔨 其他杂项 (Chores)' },
+    { type: 'revert', section: '⏪️ 回退代码 (Reverts)' },
+  ],
+  commitUrlFormat: 'https://github.com/Nanako660/mimo-tts-web/commit/{{hash}}',
+  compareUrlFormat: 'https://github.com/Nanako660/mimo-tts-web/compare/{{previousTag}}...{{currentTag}}',
+  issueUrlFormat: 'https://github.com/Nanako660/mimo-tts-web/issues/{{id}}',
+  userUrlFormat: 'https://github.com/{{user}}',
+};

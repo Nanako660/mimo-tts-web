@@ -5,6 +5,7 @@ import { VoiceDesign } from './components/VoiceDesign';
 import { VoiceClone } from './components/VoiceClone';
 import { BatchCenter } from './components/BatchCenter';
 import { SettingsModal } from './components/SettingsModal';
+import { AboutModal } from './components/AboutModal';
 import { HistoryDrawer } from './components/HistoryDrawer';
 import { AudioPlayer } from './components/AudioPlayer';
 import { AppSettings, HistoryItem, TTSModelId, AudioFormat, StreamPlayStatus } from './types';
@@ -28,6 +29,8 @@ export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AppTab>('standard');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [aboutDefaultTab, setAboutDefaultTab] = useState<'about' | 'changelog'>('about');
   const [history, setHistory] = useState<HistoryItem[]>([]);
 
   const [loading, setLoading] = useState(false);
@@ -296,6 +299,10 @@ export const App: React.FC = () => {
         hasApiKey={Boolean(settings.apiKey)}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenHistory={() => setIsHistoryOpen(true)}
+        onOpenAbout={() => {
+          setAboutDefaultTab('about');
+          setIsAboutOpen(true);
+        }}
         theme={settings.theme}
         onToggleTheme={handleToggleTheme}
         historyCount={history.length}
@@ -378,6 +385,18 @@ export const App: React.FC = () => {
         onClose={() => setIsSettingsOpen(false)}
         settings={settings}
         onSave={handleSaveSettings}
+        onOpenAbout={() => {
+          setAboutDefaultTab('changelog');
+          setIsAboutOpen(true);
+        }}
+      />
+
+      {/* 关于与更新日志弹窗 */}
+      <AboutModal
+        key={`${isAboutOpen}-${aboutDefaultTab}`}
+        isOpen={isAboutOpen}
+        onClose={() => setIsAboutOpen(false)}
+        defaultTab={aboutDefaultTab}
       />
 
       {/* 历史抽屉 */}

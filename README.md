@@ -6,15 +6,16 @@
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
-![SingleFile](https://img.shields.io/badge/Build-Single--File_HTML-orange?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-1.0.0-orange?style=for-the-badge)
+![SingleFile](https://img.shields.io/badge/Build-Single--File_HTML-blue?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
 <p align="center">
   <b>基于小米 MiMo-TTS 大模型系列 API 构建的现代高颜值、全功能、纯单文件语音合成工作台</b><br>
-  零后端依赖 · 硬件级本地加密 · 低延迟流式边收边播 · 批量合成与音频拼接导出 · 响应式暗黑琉璃设计
+  零后端依赖 · 硬件级本地加密 · 低延迟流式边收边播 · 批量合成与音频拼接导出 · 规范化版本管理与自动化发版
 </p>
 
-[**🚀 立即在线体验 (GitHub Pages)**](https://nanako660.github.io/mimo-tts-web/) · [**📦 下载单文件 HTML (dist/index.html)**](dist/index.html) · [**📖 API 与使用文档**](docs/README.md) · [**⚡ 快速上手**](#-快速上手)
+[**🚀 立即在线体验 (GitHub Pages)**](https://nanako660.github.io/mimo-tts-web/) · [**📦 下载最新 Release 独立包**](https://github.com/Nanako660/mimo-tts-web/releases) · [**📋 更新日志 (CHANGELOG)**](CHANGELOG.md) · [**📖 API 与使用文档**](docs/README.md)
 
 </div>
 
@@ -142,11 +143,80 @@ mimo-tts-web/
 
 ---
 
-## 📚 官方文档索引
+## 🏷️ 版本管理与规范发版指南
 
-- [API 完整参考手册](docs/tts-api-reference.md)
-- [使用指南与 Prompt 工程](docs/tts-usage-guide.md)
-- [错误码速查表与排查](docs/error-codes.md)
+本项目严格遵循 [Semantic Versioning (SemVer 2.0.0)](https://semver.org/lang/zh-CN/) 与 [Conventional Commits](https://www.conventionalcommits.org/zh-hans/v1.0.0/) 提交规范，并配备自动化的 CHANGELOG 生成与 GitHub Release 产物发布流水线。
+
+### 1. 规范化代码提交 (Conventional Commits)
+
+为了确保版本演进历史清晰并能自动生成精美的更新日志，建议使用内置的交互式提交助手：
+
+```bash
+# 暂存代码后执行交互式提交引导
+git add .
+npm run commit
+```
+
+**常用 Commit 类型说明：**
+- `feat:` ✨ 新增业务功能
+- `fix:` 🐛 修复问题或缺陷
+- `docs:` 📝 文档补充或更新
+- `style:` 💄 代码格式或视觉微调（不影响功能）
+- `refactor:` ♻️ 代码重构（既非新增功能也非修复 bug）
+- `perf:` ⚡️ 性能优化与提升
+- `test:` ✅ 测试用例变动
+- `build:` 📦️ 构建流程或打包配置修改
+- `ci:` 🎡 GitHub Actions 与持续集成配置调整
+- `chore:` 🔨 依赖库或辅助脚本修改
+
+> 💡 项目已配置 **Husky** 与 **Commitlint**，每次 `git commit` 时将自动执行代码规范校验与类型检查，保障代码质量。
+
+---
+
+### 2. 自动化版本发布 (Release)
+
+发布新版本时，只需在本地执行一条发版脚本即可自动完成：
+1. 计算最新版本号（SemVer）并自动更新 `package.json`
+2. 解析 Git 提交历史，自动生成/追加规范的 [`CHANGELOG.md`](CHANGELOG.md)
+3. 自动创建版本对应的 Git Tag（如 `v1.1.0`）与 Release Commit
+
+```bash
+# 自动根据 commit 类型推断版本号（patch/minor/major）
+npm run release
+
+# 显式指定发版级别
+npm run release:patch   # 小补丁发版: 1.0.0 -> 1.0.1
+npm run release:minor   # 次版本功能发版: 1.0.0 -> 1.1.0
+npm run release:major   # 主版本重构发版: 1.0.0 -> 2.0.0
+
+# 模拟发版演练（不修改实际文件和打 tag）
+npm run release:dry
+```
+
+---
+
+### 3. GitHub Actions CI/CD 自动发布流水线
+
+当发布标签（Tag）推送到 GitHub 远端后：
+
+```bash
+# 推送代码与 Tag 到 GitHub
+git push --follow-tags
+```
+
+GitHub Actions 将自动触发 [`.github/workflows/release.yml`](.github/workflows/release.yml) 工作流：
+- 🛠️ **全量构建**：自动拉取依赖并编译单文件应用。
+- 📦 **打包附件**：自动生成 `mimo-tts-web-vX.Y.Z.html`（独立单文件离线版）及 `mimo-tts-web-vX.Y.Z.zip` 压缩包。
+- 📝 **提取更新日志**：智能提取当前 Tag 在 `CHANGELOG.md` 中的对应更新内容作为 Release Body。
+- 🚀 **发布 Release**：在 GitHub Releases 页面自动创建正式版本并上传所有附件供用户直接下载。
+
+---
+
+### 4. 客户端界面内置版本与更新日志 (What's New)
+
+- **Navbar 版本徽标**：顶部导航栏 Logo 旁实时展示当前运行版本徽标（如 `v1.0.0`），点击可直接唤起「关于与更新日志」弹窗。
+- **关于与更新日志弹窗**：支持离线查看完整历史发布详情（新特性、优化项、修复项），并直达 GitHub 仓库与 Issue。
+- **设置面板集成**：在设置弹窗底部可直观查看当前构建时间与 Git Commit Hash。
 
 ---
 

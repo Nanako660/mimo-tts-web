@@ -10,7 +10,9 @@ import {
   Moon,
   ShieldCheck,
   ShieldAlert,
+  Info,
 } from 'lucide-react';
+import { getAppVersion } from '../utils/version';
 
 export type AppTab = 'standard' | 'voicedesign' | 'voiceclone' | 'batch';
 
@@ -20,6 +22,7 @@ interface NavbarProps {
   hasApiKey: boolean;
   onOpenSettings: () => void;
   onOpenHistory: () => void;
+  onOpenAbout: () => void;
   theme: 'dark' | 'light';
   onToggleTheme: () => void;
   historyCount?: number;
@@ -31,6 +34,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   hasApiKey,
   onOpenSettings,
   onOpenHistory,
+  onOpenAbout,
   theme,
   onToggleTheme,
   historyCount = 0,
@@ -58,6 +62,14 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded-full bg-orange-100 dark:bg-orange-950/80 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-900">
                 Studio
               </span>
+              <button
+                type="button"
+                onClick={onOpenAbout}
+                className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-orange-100 dark:hover:bg-orange-950 text-slate-600 dark:text-slate-400 hover:text-orange-600 dark:hover:text-orange-400 border border-slate-200 dark:border-slate-700 hover:border-orange-300 dark:hover:border-orange-800 transition-colors"
+                title="点击查看更新日志与系统信息"
+              >
+                v{getAppVersion()}
+              </button>
             </div>
             <p className="text-[10px] text-slate-500 hidden sm:block">小米语音合成大模型工作台</p>
           </div>
@@ -144,6 +156,16 @@ export const Navbar: React.FC<NavbarProps> = ({
             title="设置 API Key 与网络参数"
           >
             <Settings className="w-5 h-5" />
+          </button>
+
+          {/* About & Changelog */}
+          <button
+            type="button"
+            onClick={onOpenAbout}
+            className="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+            title="关于与更新日志 (What's New)"
+          >
+            <Info className="w-5 h-5" />
           </button>
         </div>
       </div>
