@@ -106,7 +106,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <span>MiMo API Key</span>
               </label>
               <a
-                href="https://platform.xiaomimimo.com/console/balance"
+                href="https://platform.xiaomimimo.com/console/api-keys"
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-1 text-[11px] text-orange-600 dark:text-orange-400 hover:underline"

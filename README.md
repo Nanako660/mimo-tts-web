@@ -14,7 +14,7 @@
   零后端依赖 · 硬件级本地加密 · 低延迟流式边收边播 · 批量合成与音频拼接导出 · 响应式暗黑琉璃设计
 </p>
 
-[**🚀 立即体验单文件 (dist/index.html)**](dist/index.html) · [**📖 API 与使用文档**](docs/README.md) · [**⚡ 快速上手**](#-快速上手)
+[**🚀 立即在线体验 (GitHub Pages)**](https://nanako660.github.io/mimo-tts-web/) · [**📦 下载单文件 HTML (dist/index.html)**](dist/index.html) · [**📖 API 与使用文档**](docs/README.md) · [**⚡ 快速上手**](#-快速上手)
 
 </div>
 
@@ -22,14 +22,14 @@
 
 ## 🌟 核心特性
 
-### 1. 📦 纯单文件分发 (Single-File Standalone)
-- 借助 `vite-plugin-singlefile`，所有 HTML、JavaScript 逻辑、Tailwind 样式、Lucide 图标及字体均打包编译在单一独立的 [`dist/index.html`](dist/index.html) 文件中（体积仅 ~412 KB）。
-- **完全零后端环境依赖**：下载该 HTML 文件后，在任意电脑或手机浏览器中双击即可直接运行使用！
+### 1. 🌐 零安装在线即用 & 纯单文件分发
+- **在线即用**：直接访问 [**GitHub Pages 在线工作台**](https://nanako660.github.io/mimo-tts-web/)，纯前端直连小米 API，不留存任何数据。
+- **纯单文件分发**：借助 `vite-plugin-singlefile`，所有 HTML、JavaScript 逻辑、Tailwind 样式、Lucide 图标及字体均打包编译在单一独立的 [`dist/index.html`](dist/index.html) 文件中（体积仅 ~412 KB），在任意电脑或手机浏览器中双击即可直接离线运行！
 
 ### 2. 🔐 硬件级浏览器本地加密 (Zero Leakage)
 - **Web Crypto API (AES-GCM 256-bit)**：首次打开应用时在用户浏览器本地生成不可导出的非对称/对称私钥并存入本地 IndexedDB，API Key 密文加密后留存。
 - **纯客户端直连**：所有请求直接从用户浏览器端直连小米官方 API 端点（或用户自定义反代端点），不经过任何第三方服务器中转。
-- **自定义 Base URL**：支持配置官方端点 `https://api.xiaomimimo.com/v1` 或自建中转 / Token Plan 代理端点，内置连通性测试。
+- **自定义 Base URL**：支持配置官方端点 `https://api.xiaomimimo.com/v1` 或自建中转 / Token Plan 代理端点，内置连通性测试与 [API Keys 获取直达](https://platform.xiaomimimo.com/console/api-keys)。
 
 ### 3. 🎙️ 完整支持全部 MiMo TTS 调用模式
 
@@ -71,11 +71,14 @@
 
 ## 🚀 快速上手
 
-### 方式一：直接在浏览器运行单文件（推荐）
-在发行版中下载或在项目目录中直接双击打开：
-👉 [`dist/index.html`](dist/index.html)
+### 方式一：在线直接使用（推荐）
+直接在浏览器中打开在线工作台：
+👉 [**https://nanako660.github.io/mimo-tts-web/**](https://nanako660.github.io/mimo-tts-web/)
 
-### 方式二：本地源码开发
+### 方式二：直接在本地运行单文件 HTML
+下载仓库中的 [`dist/index.html`](dist/index.html) 文件，在电脑或手机上直接双击打开即可运行。
+
+### 方式三：本地源码开发
 ```bash
 # 1. 克隆本仓库
 git clone https://github.com/Nanako660/mimo-tts-web.git
@@ -88,7 +91,7 @@ npm install
 npm run dev
 ```
 
-### 方式三：重新构建单文件
+### 方式四：重新构建单文件
 ```bash
 npm run build
 ```
