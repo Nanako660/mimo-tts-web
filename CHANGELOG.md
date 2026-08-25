@@ -4,6 +4,18 @@
 
 本更新日志遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/) 与 [Semantic Versioning](https://semver.org/lang/zh-CN/) 规范。
 
+### [1.1.1](https://github.com/Nanako660/mimo-tts-web/compare/v1.1.0...v1.1.1) (2026-08-25)
+
+
+### ✨ 新增功能 (Features)
+
+* **changelog:** auto fetch latest releases from GitHub and update official MiMo URL to mimo.mi.com ([b23a4fe](https://github.com/Nanako660/mimo-tts-web/commit/b23a4fefa0da43d2d13c3c71d183209a404364aa))
+
+
+### 📝 文档更新 (Documentation)
+
+* add AGENTS.md guidelines and update release scripts with auto push ([e44fd88](https://github.com/Nanako660/mimo-tts-web/commit/e44fd887ff95d3612da325da4ac41f19fd11e84b))
+
 ## 1.1.0 (2026-08-25)
 
 
